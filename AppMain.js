@@ -7,18 +7,20 @@ var speed = 5;
 var dx = speed;
 var dy = -speed;
 
-var paddleHeight = 10;
-var paddleWidth = 75;
+var paddleHeight = canvas.width/10;
+var paddleWidth = paddleHeight/3;
 var paddleX = (canvas.width-paddleWidth)/2;
 var paddleY = canvas.height-paddleHeight - 20;
 
 var rightPressed = false;
 var leftPressed = false;
+var upPressed = false;
+var downPressed = false;
 
-var brickRowCount = 7;
-var brickColumnCount = 3;
-var brickWidth = 75;
-var brickHeight = 20;
+var brickRowCount = 3;
+var brickColumnCount = 7;
+var brickWidth = 20;
+var brickHeight = 75;
 var brickPadding = 10;
 var brickOffsetTop = 30;
 var brickOffsetLeft = 30;
@@ -108,13 +110,22 @@ function draw() {
   drawLives();
   collisionDetection();
 
+    // 壁との当たり判定
   if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
     dx = -dx;
   }
-  if(y + dy < ballRadius) {
+  if(y + dy < ballRadius || y + dy > canvas.height-ballRadius) {
     dy = -dy;
   }
-  else if(y + dy > canvas.height-ballRadius) {
+    
+    // 当たり判定
+  if (x > paddleX && x < paddleX + paddleWidth) {
+    if(y > paddleY && y < paddleY + paddleHeight) {
+      dx = -dx;
+    }      
+  }
+    
+  if(y + dy > canvas.height-ballRadius) {
       lives--;
       if(!lives) {
         alert("GAME OVER");
@@ -128,17 +139,21 @@ function draw() {
         paddleX = (canvas.width-paddleWidth)/2;
       }
   }
-  else if (y + dy > paddleY-ballRadius) {
-    if(x > paddleX && x < paddleX + paddleWidth) {
-      dy = -dy;
-    }      
-  }
+    
+
 
   if(rightPressed && paddleX < canvas.width-paddleWidth) {
     paddleX += 7;
   }
   else if(leftPressed && paddleX > 0) {
     paddleX -= 7;
+  }
+    
+  if(upPressed && paddleY > 0) {
+    paddleY -= 7;
+  }
+  else if(downPressed && paddleY < canvas.height-paddleHeight) {
+    paddleY += 7;
   }
 
   x += dx;

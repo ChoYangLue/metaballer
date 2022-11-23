@@ -9,6 +9,13 @@ function keyDownHandler(e) {
     else if(e.key == "Left" || e.key == "ArrowLeft") {
         leftPressed = true;
     }
+    
+    if(e.key == "Up" || e.key == "ArrowUp") {
+        upPressed = true;
+    }
+    else if(e.key == "Down" || e.key == "ArrowDown") {
+        downPressed = true;
+    }
 }
 
 function keyUpHandler(e) {
@@ -18,11 +25,23 @@ function keyUpHandler(e) {
     else if(e.key == "Left" || e.key == "ArrowLeft") {
         leftPressed = false;
     }
+    
+    if(e.key == "Up" || e.key == "ArrowUp") {
+        upPressed = false;
+    }
+    else if(e.key == "Down" || e.key == "ArrowDown") {
+        downPressed = false;
+    }
 }
 
 function mouseMoveHandler(e) {
   var relativeX = e.clientX - canvas.offsetLeft;
   if(relativeX > 0 && relativeX < canvas.width) {
     paddleX = relativeX - paddleWidth/2;
+  }
+    
+  var relativeY = e.clientY - canvas.offsetTop;
+  if (relativeY > 0 && relativeY < canvas.height) {
+    paddleY = relativeY - paddleHeight/2;
   }
 }
