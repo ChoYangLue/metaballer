@@ -9,13 +9,14 @@ var dy = -speed;
 
 var paddleHeight = canvas.width/10;
 var paddleWidth = paddleHeight/3;
-var paddleX = (canvas.width-paddleWidth)/2;
+var paddleX = (canvas.width-paddleWidth)*2/3;
 var paddleY = canvas.height-paddleHeight - 20;
 
 var rightPressed = false;
 var leftPressed = false;
 var upPressed = false;
 var downPressed = false;
+var diffence = false;
 
 var brickRowCount = 3;
 var brickColumnCount = 7;
@@ -58,7 +59,7 @@ function collisionDetection() {
 function drawBall() {
   ctx.beginPath();
   ctx.arc(x, y, ballRadius, 0, Math.PI*2);
-  ctx.fillStyle = "#0095DD";
+  ctx.fillStyle = "#6e00dd";
   ctx.fill();
   ctx.closePath();
 }
@@ -66,7 +67,11 @@ function drawBall() {
 function drawPaddle() {
   ctx.beginPath();
   ctx.rect(paddleX, paddleY, paddleWidth, paddleHeight);
-  ctx.fillStyle = "#0095DD";
+  if (diffence){
+      ctx.fillStyle = "#00dd3b";
+  } else {
+      ctx.fillStyle = "#0095DD";
+  }
   ctx.fill();
   ctx.closePath();
 }
@@ -121,7 +126,16 @@ function draw() {
     // 当たり判定
   if (x > paddleX && x < paddleX + paddleWidth) {
     if(y > paddleY && y < paddleY + paddleHeight) {
-      dx = -dx;
+        if(diffence){
+           dx = -dx; 
+        }
+        else {
+            lives--;
+          if(!lives) {
+            alert("GAME OVER");
+            document.location.reload();
+          }
+        }
     }      
   }
     
