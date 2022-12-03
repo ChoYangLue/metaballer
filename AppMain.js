@@ -7,15 +7,36 @@ var speed = 5;
 var dx = speed;
 var dy = -speed;
 
-var paddleHeight = canvas.width/10;
-var paddleWidth = paddleHeight/3;
-var paddleX = (canvas.width-paddleWidth)*2/3;
-var paddleY = canvas.height-paddleHeight - 20;
+var mainPlayerIndex = 0;
+class Player
+{
+    constructor()
+    {
+        this.playerHeight = canvas.width/10;
+        this.playerWidth = playerHeight/3;
+        this.playerX = (canvas.width-playerWidth)*2/3;
+        this.playerY = canvas.height-playerHeight - 20;
+        
+        this.moveRight = false;
+        this.moveLeft = false;
+        this.moveUp = false;
+        this.moveDown = false;
+        this.diffence = false;
+    }
+}
 
-var rightPressed = false;
-var leftPressed = false;
-var upPressed = false;
-var downPressed = false;
+var players = new Array();
+players.push(new Player());
+
+var playerHeight = canvas.width/10;
+var playerWidth = playerHeight/3;
+var playerX = (canvas.width-playerWidth)*2/3;
+var playerY = canvas.height-playerHeight - 20;
+
+var moveRight = false;
+var moveLeft = false;
+var moveUp = false;
+var moveDown = false;
 var diffence = false;
 
 var brickRowCount = 3;
@@ -66,7 +87,7 @@ function drawBall() {
 
 function drawPaddle() {
   ctx.beginPath();
-  ctx.rect(paddleX, paddleY, paddleWidth, paddleHeight);
+  ctx.rect(playerX, playerY, playerWidth, playerHeight);
   if (diffence){
       ctx.fillStyle = "#00dd3b";
   } else {
@@ -124,8 +145,8 @@ function draw() {
   }
     
     // 当たり判定
-  if (x > paddleX && x < paddleX + paddleWidth) {
-    if(y > paddleY && y < paddleY + paddleHeight) {
+  if (x > playerX && x < playerX + playerWidth) {
+    if(y > playerY && y < playerY + playerHeight) {
         if(diffence){
            dx = -dx; 
         }
@@ -138,36 +159,19 @@ function draw() {
         }
     }      
   }
-    
-  if(y + dy > canvas.height-ballRadius) {
-      lives--;
-      if(!lives) {
-        alert("GAME OVER");
-        document.location.reload();
-      }
-      else {
-        x = canvas.width/2;
-        y = canvas.height-30;
-        dx = speed;
-        dy = -speed;
-        paddleX = (canvas.width-paddleWidth)/2;
-      }
-  }
-    
 
-
-  if(rightPressed && paddleX < canvas.width-paddleWidth) {
-    paddleX += 7;
+  if(moveRight && playerX < canvas.width-playerWidth) {
+    playerX += 7;
   }
-  else if(leftPressed && paddleX > 0) {
-    paddleX -= 7;
+  else if(moveLeft && playerX > 0) {
+    playerX -= 7;
   }
     
-  if(upPressed && paddleY > 0) {
-    paddleY -= 7;
+  if(moveUp && playerY > 0) {
+    playerY -= 7;
   }
-  else if(downPressed && paddleY < canvas.height-paddleHeight) {
-    paddleY += 7;
+  else if(moveDown && playerY < canvas.height-playerHeight) {
+    playerY += 7;
   }
 
   x += dx;

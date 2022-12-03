@@ -6,45 +6,45 @@ document.addEventListener("mouseup", mouseUpHandler, false);
 
 function keyDownHandler(e) {
     if(e.key == "Right" || e.key == "ArrowRight") {
-        rightPressed = true;
+        moveRight = true;
     }
     else if(e.key == "Left" || e.key == "ArrowLeft") {
-        leftPressed = true;
+        moveLeft = true;
     }
     
     if(e.key == "Up" || e.key == "ArrowUp") {
-        upPressed = true;
+        moveUp = true;
     }
     else if(e.key == "Down" || e.key == "ArrowDown") {
-        downPressed = true;
+        moveDown = true;
     }
 }
 
 function keyUpHandler(e) {
     if(e.key == "Right" || e.key == "ArrowRight") {
-        rightPressed = false;
+        moveRight = false;
     }
     else if(e.key == "Left" || e.key == "ArrowLeft") {
-        leftPressed = false;
+        moveLeft = false;
     }
     
     if(e.key == "Up" || e.key == "ArrowUp") {
-        upPressed = false;
+        moveUp = false;
     }
     else if(e.key == "Down" || e.key == "ArrowDown") {
-        downPressed = false;
+        moveDown = false;
     }
 }
 
 function mouseMoveHandler(e) {
   var relativeX = e.clientX - canvas.offsetLeft;
   if(relativeX > 0 && relativeX < canvas.width) {
-    paddleX = relativeX - paddleWidth/2;
+    playerX = relativeX - playerWidth/2;
   }
     
   var relativeY = e.clientY - canvas.offsetTop;
   if (relativeY > 0 && relativeY < canvas.height) {
-    paddleY = relativeY - paddleHeight/2;
+    playerY = relativeY - playerHeight/2;
   }
 }
 
