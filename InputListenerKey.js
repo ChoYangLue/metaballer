@@ -39,18 +39,18 @@ function keyUpHandler(e) {
 function mouseMoveHandler(e) {
   var relativeX = e.clientX - canvas.offsetLeft;
   if(relativeX > 0 && relativeX < canvas.width) {
-    playerX = relativeX - playerWidth/2;
+    players[mainPlayerIndex].playerX = relativeX - players[mainPlayerIndex].playerWidth/2;
   }
     
   var relativeY = e.clientY - canvas.offsetTop;
   if (relativeY > 0 && relativeY < canvas.height) {
-    playerY = relativeY - playerHeight/2;
+    players[mainPlayerIndex].playerY = relativeY - players[mainPlayerIndex].playerHeight/2;
   }
 }
 
 function mouseDownHandler(e){
-    diffence = true;
+    players[mainPlayerIndex].diffence = true;
 }
 function mouseUpHandler(e){
-    diffence = false;
+    players[mainPlayerIndex].diffence = false;
 }

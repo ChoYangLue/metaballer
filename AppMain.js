@@ -13,31 +13,23 @@ class Player
     constructor()
     {
         this.playerHeight = canvas.width/10;
-        this.playerWidth = playerHeight/3;
-        this.playerX = (canvas.width-playerWidth)*2/3;
-        this.playerY = canvas.height-playerHeight - 20;
+        this.playerWidth = this.playerHeight/3;
+        this.playerX = (canvas.width-this.playerWidth)*2/3;
+        this.playerY = canvas.height-this.playerHeight - 20;
         
         this.moveRight = false;
         this.moveLeft = false;
         this.moveUp = false;
         this.moveDown = false;
         this.diffence = false;
+        
+        this.life = 3;
+        this.score = 0;
     }
 }
 
 var players = new Array();
 players.push(new Player());
-
-var playerHeight = canvas.width/10;
-var playerWidth = playerHeight/3;
-var playerX = (canvas.width-playerWidth)*2/3;
-var playerY = canvas.height-playerHeight - 20;
-
-var moveRight = false;
-var moveLeft = false;
-var moveUp = false;
-var moveDown = false;
-var diffence = false;
 
 var brickRowCount = 3;
 var brickColumnCount = 7;
@@ -46,9 +38,6 @@ var brickHeight = 75;
 var brickPadding = 10;
 var brickOffsetTop = 30;
 var brickOffsetLeft = 30;
-
-var score = 0;
-var lives = 3;
 
 var bricks = [];
 for(var c=0; c<brickColumnCount; c++) {
@@ -66,8 +55,8 @@ function collisionDetection() {
         if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
           dy = -dy;
           b.status = 0;
-          score++;
-          if(score == brickRowCount*brickColumnCount) {
+          players[mainPlayerIndex].score++;
+          if(players[mainPlayerIndex].score == brickRowCount*brickColumnCount) {
             alert("YOU WIN, CONGRATS!");
             document.location.reload();
           }
@@ -87,8 +76,11 @@ function drawBall() {
 
 function drawPaddle() {
   ctx.beginPath();
-  ctx.rect(playerX, playerY, playerWidth, playerHeight);
-  if (diffence){
+  ctx.rect(players[mainPlayerIndex].playerX, 
+           players[mainPlayerIndex].playerY, 
+           players[mainPlayerIndex].playerWidth, 
+           players[mainPlayerIndex].playerHeight);
+  if (players[mainPlayerIndex].diffence){
       ctx.fillStyle = "#00dd3b";
   } else {
       ctx.fillStyle = "#0095DD";
@@ -118,13 +110,13 @@ function drawBricks() {
 function drawScore() {
   ctx.font = "16px Arial";
   ctx.fillStyle = "#0095DD";
-  ctx.fillText("Score: "+score, 8, 20);
+  ctx.fillText("Score: "+players[mainPlayerIndex].score, 8, 20);
 }
 
 function drawLives() {
   ctx.font = "16px Arial";
   ctx.fillStyle = "#0095DD";
-  ctx.fillText("Lives: "+lives, canvas.width-65, 20);
+  ctx.fillText("Lives: "+players[mainPlayerIndex].life, canvas.width-65, 20);
 }
 
 function draw() {
@@ -145,33 +137,33 @@ function draw() {
   }
     
     // 当たり判定
-  if (x > playerX && x < playerX + playerWidth) {
-    if(y > playerY && y < playerY + playerHeight) {
-        if(diffence){
+  if (x > players[mainPlayerIndex].playerX && x < players[mainPlayerIndex].playerX + players[mainPlayerIndex].playerWidth) {
+    if(y > players[mainPlayerIndex].playerY && y < players[mainPlayerIndex].playerY + players[mainPlayerIndex].playerHeight) {
+        if(players[mainPlayerIndex].diffence){
            dx = -dx; 
         }
         else {
-            lives--;
-          if(!lives) {
+            if(!players[mainPlayerIndex].life) {
             alert("GAME OVER");
             document.location.reload();
           }
+            players[mainPlayerIndex].life--;
         }
     }      
   }
 
-  if(moveRight && playerX < canvas.width-playerWidth) {
-    playerX += 7;
+  if(players[mainPlayerIndex].moveRight && players[mainPlayerIndex].playerX < canvas.width-players[mainPlayerIndex].playerWidth) {
+    players[mainPlayerIndex].playerX += 7;
   }
-  else if(moveLeft && playerX > 0) {
-    playerX -= 7;
+  else if(players[mainPlayerIndex].moveLeft && players[mainPlayerIndex].playerX > 0) {
+    players[mainPlayerIndex].playerX -= 7;
   }
     
-  if(moveUp && playerY > 0) {
-    playerY -= 7;
+  if(players[mainPlayerIndex].moveUp && players[mainPlayerIndex].playerY > 0) {
+    players[mainPlayerIndex].playerY -= 7;
   }
-  else if(moveDown && playerY < canvas.height-playerHeight) {
-    playerY += 7;
+  else if(players[mainPlayerIndex].moveDown && players[mainPlayerIndex].playerY < canvas.height-players[mainPlayerIndex].playerHeight) {
+    players[mainPlayerIndex].playerY += 7;
   }
 
   x += dx;
