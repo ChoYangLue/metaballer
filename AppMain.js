@@ -16,6 +16,7 @@ class Player
         this.playerWidth = this.playerHeight/3;
         this.playerX = (canvas.width-this.playerWidth)*2/3;
         this.playerY = canvas.height-this.playerHeight - 20;
+        this.speed = 7;
         
         this.moveRight = false;
         this.moveLeft = false;
@@ -58,40 +59,6 @@ var players = new Array();
 players.push(new Player("main"));
 players.push(new Player("enemy"));
 
-var brickRowCount = 3;
-var brickColumnCount = 7;
-var brickWidth = 20;
-var brickHeight = 75;
-var brickPadding = 10;
-var brickOffsetTop = 30;
-var brickOffsetLeft = 30;
-
-var bricks = [];
-for(var c=0; c<brickColumnCount; c++) {
-  bricks[c] = [];
-  for(var r=0; r<brickRowCount; r++) {
-    bricks[c][r] = { x: 0, y: 0, status: 1 };
-  }
-}
-
-function collisionDetection() {
-  for(var c=0; c<brickColumnCount; c++) {
-    for(var r=0; r<brickRowCount; r++) {
-      var b = bricks[c][r];
-      if(b.status == 1) {
-        if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
-          dy = -dy;
-          b.status = 0;
-          players[mainPlayerIndex].score++;
-          if(players[mainPlayerIndex].score == brickRowCount*brickColumnCount) {
-            alert("YOU WIN, CONGRATS!");
-            document.location.reload();
-          }
-        }
-      }
-    }
-  }
-}
 
 function drawBall() {
   ctx.beginPath();
@@ -106,24 +73,6 @@ function drawPaddle() {
         players[i].draw();
         players[i].drawLife();
     }
-}
-
-function drawBricks() {
-  for(var c=0; c<brickColumnCount; c++) {
-    for(var r=0; r<brickRowCount; r++) {
-      if(bricks[c][r].status == 1) {
-        var brickX = (r*(brickWidth+brickPadding))+brickOffsetLeft;
-        var brickY = (c*(brickHeight+brickPadding))+brickOffsetTop;
-        bricks[c][r].x = brickX;
-        bricks[c][r].y = brickY;
-        ctx.beginPath();
-        ctx.rect(brickX, brickY, brickWidth, brickHeight);
-        ctx.fillStyle = "#0095DD";
-        ctx.fill();
-        ctx.closePath();
-      }
-    }
-  }
 }
 
 function drawScore() {
@@ -146,12 +95,13 @@ function collisionPlayer2Ball(player, x, y)
            dx = -dx; 
         }
         else {
-            if (!this.hit) player.life--;
+            console.log("hit!");
+            if (player.hit == false) player.life--;
         }
-        this.hit = true;
+        player.hit = true;
     }      
   }else{
-        this.hit = false; 
+        player.hit = false; 
   }
  
 }
@@ -167,14 +117,51 @@ function collisionBall2Wall()
     }
 }
 
+
+function movePlayer(mpi)
+{
+    if(players[mpi].moveRight && 
+       players[mpi].playerX < canvas.width-players[mpi].playerWidth) {
+        players[mpi].playerX += 7;
+    }
+    else if(players[mpi].moveLeft && 
+            players[mpi].playerX > 0) {
+        players[mpi].playerX -= 7;
+    }
+    
+    if(players[mpi].moveUp && 
+       players[mpi].playerY > 0) {
+        players[mpi].playerY -= players[mpi].speed;
+    }
+    else if(players[mpi].moveDown && 
+            players[mpi].playerY < canvas.height-players[mpi].playerHeight) {
+        players[mpi].playerY += players[mpi].speed;
+    }
+}
+
+function moveEnemy(pindex)
+{
+    var randomNumber = Math.floor( Math.random() * 51 );
+    if (randomNumber == 1) {
+        players[pindex].speed *= -1;
+    }
+    
+    if (players[pindex].playerY<0) {
+        players[pindex].speed = Math.abs(players[pindex].speed);
+    } else if (players[pindex].playerY>canvas.height-players[pindex].playerHeight) {
+        players[pindex].speed = -1*Math.abs(players[pindex].speed);
+    }
+    
+    players[pindex].playerY += players[pindex].speed;
+}
+
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawBricks();
+    
     drawBall();
     drawPaddle();
     drawScore();
     
-    collisionDetection();
     collisionBall2Wall();
     
     // 当たり判定
@@ -183,33 +170,26 @@ function draw() {
         
         if(players[i].life<0 && i == mainPlayerIndex) {
             alert("GAME OVER");
+            x = canvas.width/2;
+            y = canvas.height/2;
+            players[i].life = 3;
             document.location.reload();
         } else if (players[i].life<0 && i != mainPlayerIndex) {
             alert("YOU WIN, CONGRATS!");
+            x = canvas.width/2;
+            y = canvas.height/2;
+            players[i].life = 3;
             document.location.reload();
         }
     }
             
-    
+    movePlayer(mainPlayerIndex);
+    moveEnemy(1);
 
-  if(players[mainPlayerIndex].moveRight && players[mainPlayerIndex].playerX < canvas.width-players[mainPlayerIndex].playerWidth) {
-    players[mainPlayerIndex].playerX += 7;
-  }
-  else if(players[mainPlayerIndex].moveLeft && players[mainPlayerIndex].playerX > 0) {
-    players[mainPlayerIndex].playerX -= 7;
-  }
+    x += dx;
+    y += dy;
     
-  if(players[mainPlayerIndex].moveUp && players[mainPlayerIndex].playerY > 0) {
-    players[mainPlayerIndex].playerY -= 7;
-  }
-  else if(players[mainPlayerIndex].moveDown && players[mainPlayerIndex].playerY < canvas.height-players[mainPlayerIndex].playerHeight) {
-    players[mainPlayerIndex].playerY += 7;
-  }
-
-  x += dx;
-  y += dy;
-    
-  requestAnimationFrame(draw);
+    requestAnimationFrame(draw);
 }
 
 draw();
