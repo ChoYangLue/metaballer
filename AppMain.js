@@ -2,16 +2,16 @@ var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
 var ballRadius = 10;
 var x = canvas.width/2;
-var y = canvas.height-40;
+var y = canvas.height/2;
 var speed = 5;
 var dx = speed;
 var dy = -speed;
 
-var mainPlayerIndex = 0;
 class Player
 {
-    constructor()
+    constructor(name)
     {
+        this.name = name;
         this.playerHeight = canvas.width/10;
         this.playerWidth = this.playerHeight/3;
         this.playerX = (canvas.width-this.playerWidth)*2/3;
@@ -21,15 +21,42 @@ class Player
         this.moveLeft = false;
         this.moveUp = false;
         this.moveDown = false;
+        
         this.diffence = false;
+        this.hit = false;
         
         this.life = 3;
         this.score = 0;
     }
+    
+    draw()
+    {
+        ctx.beginPath();
+        ctx.rect(
+            this.playerX, 
+            this.playerY, 
+            this.playerWidth, 
+            this.playerHeight);
+        if (this.diffence){
+            ctx.fillStyle = "#00dd3b";
+        } else {
+            ctx.fillStyle = "#0095DD";
+        }
+        ctx.fill();
+        ctx.closePath();
+    }
+    
+    drawLife() {
+        ctx.font = "16px Arial";
+        ctx.fillStyle = "#0095DD";
+        ctx.fillText("Life: "+this.life, this.playerX, this.playerY - 20);
+    }
 }
 
+var mainPlayerIndex = 0;
 var players = new Array();
-players.push(new Player());
+players.push(new Player("main"));
+players.push(new Player("enemy"));
 
 var brickRowCount = 3;
 var brickColumnCount = 7;
@@ -75,18 +102,10 @@ function drawBall() {
 }
 
 function drawPaddle() {
-  ctx.beginPath();
-  ctx.rect(players[mainPlayerIndex].playerX, 
-           players[mainPlayerIndex].playerY, 
-           players[mainPlayerIndex].playerWidth, 
-           players[mainPlayerIndex].playerHeight);
-  if (players[mainPlayerIndex].diffence){
-      ctx.fillStyle = "#00dd3b";
-  } else {
-      ctx.fillStyle = "#0095DD";
-  }
-  ctx.fill();
-  ctx.closePath();
+    for (var i = 0; i < players.length; i++) {
+        players[i].draw();
+        players[i].drawLife();
+    }
 }
 
 function drawBricks() {
@@ -113,44 +132,65 @@ function drawScore() {
   ctx.fillText("Score: "+players[mainPlayerIndex].score, 8, 20);
 }
 
-function drawLives() {
-  ctx.font = "16px Arial";
-  ctx.fillStyle = "#0095DD";
-  ctx.fillText("Lives: "+players[mainPlayerIndex].life, canvas.width-65, 20);
-}
 
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawBricks();
-  drawBall();
-  drawPaddle();
-  drawScore();
-  drawLives();
-  collisionDetection();
-
-    // 壁との当たり判定
-  if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
-    dx = -dx;
-  }
-  if(y + dy < ballRadius || y + dy > canvas.height-ballRadius) {
-    dy = -dy;
-  }
-    
-    // 当たり判定
-  if (x > players[mainPlayerIndex].playerX && x < players[mainPlayerIndex].playerX + players[mainPlayerIndex].playerWidth) {
-    if(y > players[mainPlayerIndex].playerY && y < players[mainPlayerIndex].playerY + players[mainPlayerIndex].playerHeight) {
-        if(players[mainPlayerIndex].diffence){
+function collisionPlayer2Ball(player, x, y)
+{
+        // 当たり判定
+  if (x > player.playerX && 
+      x < player.playerX + player.playerWidth) 
+  {
+    if(y > player.playerY && 
+       y < player.playerY + player.playerHeight) 
+    {
+        if(player.diffence){
            dx = -dx; 
         }
         else {
-            if(!players[mainPlayerIndex].life) {
+            if (!this.hit) player.life--;
+        }
+        this.hit = true;
+    }      
+  }else{
+        this.hit = false; 
+  }
+ 
+}
+
+function collisionBall2Wall()
+{
+    // 壁との当たり判定
+    if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
+        dx = -dx;
+    }
+    if(y + dy < ballRadius || y + dy > canvas.height-ballRadius) {
+        dy = -dy;
+    }
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBricks();
+    drawBall();
+    drawPaddle();
+    drawScore();
+    
+    collisionDetection();
+    collisionBall2Wall();
+    
+    // 当たり判定
+    for (var i = 0; i < players.length; i++) {
+        collisionPlayer2Ball(players[i], x, y);
+        
+        if(players[i].life<0 && i == mainPlayerIndex) {
             alert("GAME OVER");
             document.location.reload();
-          }
-            players[mainPlayerIndex].life--;
+        } else if (players[i].life<0 && i != mainPlayerIndex) {
+            alert("YOU WIN, CONGRATS!");
+            document.location.reload();
         }
-    }      
-  }
+    }
+            
+    
 
   if(players[mainPlayerIndex].moveRight && players[mainPlayerIndex].playerX < canvas.width-players[mainPlayerIndex].playerWidth) {
     players[mainPlayerIndex].playerX += 7;
@@ -168,6 +208,7 @@ function draw() {
 
   x += dx;
   y += dy;
+    
   requestAnimationFrame(draw);
 }
 
