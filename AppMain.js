@@ -1,11 +1,46 @@
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
-var ballRadius = 10;
-var x = canvas.width/2;
-var y = canvas.height/2;
-var speed = 5;
-var dx = speed;
-var dy = -speed;
+
+class Ball
+{
+    constructor()
+    {
+        this.ballRadius = 10;
+        
+        this.x = canvas.width/2;
+        this.y = canvas.height/2;
+        this.speed = 5;
+        this.dx = this.speed;
+        this.dy = -this.speed;
+    }
+    
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.ballRadius, 0, Math.PI*2);
+      ctx.fillStyle = "#6e00dd";
+      ctx.fill();
+      ctx.closePath();
+    }
+    
+    hitPaddle(paddleForce)
+    {
+        this.dx = -this.dx * paddleForce;
+    }
+    
+    hitWall(isHorizon)
+    {
+        var sp = 1;
+        if (isHorizon){
+            if (Math.abs(this.dx) > this.speed) sp = 1/2;
+            this.dx = -this.dx * sp;
+            return;
+        }
+        
+        //if (Math.abs(this.dy) > this.speed) sp = 1/2;
+        this.dy = -this.dy * sp;
+    }
+}
+var ball = new Ball();
 
 class Player
 {
@@ -61,11 +96,7 @@ players.push(new Player("enemy"));
 
 
 function drawBall() {
-  ctx.beginPath();
-  ctx.arc(x, y, ballRadius, 0, Math.PI*2);
-  ctx.fillStyle = "#6e00dd";
-  ctx.fill();
-  ctx.closePath();
+      ball.draw();
 }
 
 function drawPaddle() {
@@ -82,17 +113,19 @@ function drawScore() {
 }
 
 
-function collisionPlayer2Ball(player, x, y)
+function collisionPlayer2Ball(player, ballObject)
 {
         // 当たり判定
-  if (x > player.playerX && 
-      x < player.playerX + player.playerWidth) 
+  if (ballObject.x > player.playerX && 
+      ballObject.x < player.playerX + player.playerWidth) 
   {
-    if(y > player.playerY && 
-       y < player.playerY + player.playerHeight) 
+    if(ballObject.y > player.playerY && 
+       ballObject.y < player.playerY + player.playerHeight) 
     {
         if(player.diffence){
-           if (player.hit == false) dx = -dx; 
+           if (player.hit == false){
+               ballObject.hitPaddle(2);
+           }
         }
         else {
             console.log("hit!");
@@ -106,14 +139,16 @@ function collisionPlayer2Ball(player, x, y)
  
 }
 
-function collisionBall2Wall()
+function collisionBall2Wall(ballObject)
 {
     // 壁との当たり判定
-    if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
-        dx = -dx;
+    if(ballObject.x + ballObject.dx > canvas.width-ballObject.ballRadius ||
+       ballObject.x + ballObject.dx < ballObject.ballRadius) {
+        ballObject.hitWall(true);
     }
-    if(y + dy < ballRadius || y + dy > canvas.height-ballRadius) {
-        dy = -dy;
+    if(ballObject.y + ballObject.dy < ballObject.ballRadius ||
+       ballObject.y + ballObject.dy > canvas.height-ballObject.ballRadius) {
+        ballObject.hitWall(false);
     }
 }
 
@@ -162,22 +197,22 @@ function draw() {
     drawPaddle();
     drawScore();
     
-    collisionBall2Wall();
+    collisionBall2Wall(ball);
     
     // 当たり判定
     for (var i = 0; i < players.length; i++) {
-        collisionPlayer2Ball(players[i], x, y);
+        collisionPlayer2Ball(players[i], ball);
         
         if(players[i].life<0 && i == mainPlayerIndex) {
             alert("GAME OVER");
-            x = canvas.width/2;
-            y = canvas.height/2;
+            ball.x = canvas.width/2;
+            ball.y = canvas.height/2;
             players[i].life = 3;
             document.location.reload();
         } else if (players[i].life<0 && i != mainPlayerIndex) {
             alert("YOU WIN, CONGRATS!");
-            x = canvas.width/2;
-            y = canvas.height/2;
+            ball.x = canvas.width/2;
+            ball.y = canvas.height/2;
             players[i].life = 3;
             document.location.reload();
         }
@@ -191,8 +226,8 @@ function draw() {
         }
     }
 
-    x += dx;
-    y += dy;
+    ball.x += ball.dx;
+    ball.y += ball.dy;
     
     requestAnimationFrame(draw);
 }

@@ -1,1 +1,10 @@
-canvas { background: #eee; }
+body {
+    cursor: none;
+    margin: 0px;
+    width: 896px;
+    height: 512px;
+    position: fixed;
+}
+canvas { 
+    background: #eee; 
+}
