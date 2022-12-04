@@ -92,7 +92,7 @@ function collisionPlayer2Ball(player, x, y)
        y < player.playerY + player.playerHeight) 
     {
         if(player.diffence){
-           dx = -dx; 
+           if (player.hit == false) dx = -dx; 
         }
         else {
             console.log("hit!");
@@ -182,9 +182,14 @@ function draw() {
             document.location.reload();
         }
     }
-            
-    movePlayer(mainPlayerIndex);
-    moveEnemy(1);
+    
+    for (var i = 0; i < players.length; i++) {
+        if (i == mainPlayerIndex){
+            movePlayer(mainPlayerIndex);
+        }else{
+            moveEnemy(i);
+        }
+    }
 
     x += dx;
     y += dy;
